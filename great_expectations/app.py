@@ -136,61 +136,6 @@ DQ_APP = DataQuality(datasource_name, df)
 check = "expect_column_values_to_not_be_null(column='total_rooms', mostly=0.8, condition_parser='pandas', row_condition='population<=800')"
 DQ_APP.run_expectation(check)
 
-#create expectation suite if not exist
-# expectation_suite_name = "birdi_suite"
-# context.add_or_update_expectation_suite(
-#                 expectation_suite_name = expectation_suite_name
-#             )
-
-#pass that request into context.get_validator
-# validator = context.get_validator(
-#     batch_request=batch_request,
-#     expectation_suite_name=expectation_suite_name,
-# )
-
-#Save validation
-# expectation = validator.expect_column_values_to_not_be_null(column="total_rooms", mostly=0.70)
-# validator.save_expectation_suite(discard_failed_expectations=False)
-
-
-#Add checkpoint
-
-# checkpoint_config = {
-#                 "name": checkpoint_name,
-#                 "class_name": "SimpleCheckpoint",
-#                 "run_name_template": "%Y%m%d-%H%M%S",
-#             }
-# context.test_yaml_config(yaml.dump(checkpoint_config))
-# context.add_or_update_checkpoint(**checkpoint_config)
-#context.add_or_update_checkpoint(checkpoint=checkpoint)
-#print(checkpoint)
-
-#Run checkpoint
-# checkpoint_result = context.run_checkpoint(
-#             checkpoint_name = checkpoint_name,
-#             validations=[
-#                 {
-#                     "batch_request": batch_request,
-#                     "expectation_suite_name": expectation_suite_name,
-#                 }
-#             ],
-#         )
-
-#context.build_data_docs()
-
-# get the latest running data documentation
-# data_docs_path = f'great_expectations/uncommitted/data_docs/local_site/validations/{expectation_suite_name}'
-# latest_file = max(os.listdir(data_docs_path))
-# render_path = os.path.join(data_docs_path, latest_file)
-
-# print(f"Render path is {render_path}")
-
-
-# for k,v in checkpoint_result['run_results'].items():
-#     render_file = v['actions_results']['update_data_docs']['local_site'].replace('file://', '')
-
-# print(f"Render file is {render_file}")
-
 # Define the title
 st.title('Data Quality')
 
