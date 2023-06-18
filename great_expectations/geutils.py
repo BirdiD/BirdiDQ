@@ -116,7 +116,7 @@ class DataQuality():
                             }
                             ],
                 )
-    def open_data_docs(self):
+    def get_data_docs(self):
         """
         Define the button to open the HTML file
         """
