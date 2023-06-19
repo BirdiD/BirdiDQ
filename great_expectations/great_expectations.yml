@@ -1,4 +1,3 @@
-
 # Welcome to Great Expectations! Always know what to expect from your data.
 #
 # Here you can define datasources, batch kwargs generators, integrations and
@@ -9,12 +8,24 @@
 
 # config_version refers to the syntactic version of this config file, and is used in maintaining backwards compatibility
 # It is auto-generated and usually does not need to be changed.
-config_version: 3
+config_version: 3.0
 
 # Datasources tell Great Expectations where your data lives and how to get it.
 # You can use the CLI command `great_expectations datasource new` to help you
 # add a new datasource. Read more at https://docs.greatexpectations.io/docs/guides/connecting_to_your_data/connect_to_data_overview
-datasources: {}
+datasources:
+  california_housing_test.csv:
+    module_name: great_expectations.datasource
+    execution_engine:
+      class_name: PandasExecutionEngine
+      module_name: great_expectations.execution_engine
+    data_connectors:
+      runtime_connector:
+        module_name: great_expectations.datasource.data_connector
+        batch_identifiers:
+          - run_id
+        class_name: RuntimeDataConnector
+    class_name: Datasource
 
 # This config file supports variable substitution which enables: 1) keeping
 # secrets out of source control & 2) environment-based configuration changes
@@ -61,10 +72,7 @@ stores:
       base_directory: uncommitted/validations/
 
   evaluation_parameter_store:
-    # Evaluation Parameters enable dynamic expectations. Read more here:
-    # https://docs.greatexpectations.io/docs/reference/evaluation_parameters/
     class_name: EvaluationParameterStore
-
   checkpoint_store:
     class_name: CheckpointStore
     store_backend:
@@ -91,13 +99,18 @@ data_docs_sites:
   # profiles from the uncommitted directory. Read more at https://docs.greatexpectations.io/docs/terms/data_docs
   local_site:
     class_name: SiteBuilder
-    # set to false to hide how-to buttons in Data Docs
     show_how_to_buttons: true
     store_backend:
-        class_name: TupleFilesystemStoreBackend
-        base_directory: uncommitted/data_docs/local_site/
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/data_docs/local_site/
     site_index_builder:
-        class_name: DefaultSiteIndexBuilder
+      class_name: DefaultSiteIndexBuilder
 
 anonymous_usage_statistics:
-  enabled: True
+  enabled: true
+  data_context_id: bec5a6ba-547f-44a8-a5f5-09d35c2833b6
+include_rendered_content:
+  expectation_suite: false
+  expectation_validation_result: false
+  globally: false
+notebooks:

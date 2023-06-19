@@ -2,10 +2,11 @@ import streamlit as st
 import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from streamlit_extras.let_it_rain import rain
+from streamlit_extras.dataframe_explorer import dataframe_explorer
 import pandas as pd
 import time
 import webbrowser
-from great_expectations.geutils import DataQuality
+from geutils import DataQuality
 
 
 def display_test_result(result):
@@ -66,7 +67,9 @@ def main():
         # Display a preview of the data
         st.subheader("Preview of the data:")
         data = pd.read_csv(f"great_expectations/data/{data_source}")
-        st.write(data.head())
+        filtered_df = dataframe_explorer(data, case=False)
+        st.dataframe(filtered_df, use_container_width=True)
+        #st.write(data.head())
 
         if DQ_APP is None:  # Create DQ_APP object if not already created
             DQ_APP = DataQuality(data_source, data)
