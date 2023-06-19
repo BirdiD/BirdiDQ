@@ -34,13 +34,12 @@ def main():
             if submit_button:
                 with st.spinner('Running your data quality checks'):
                     time.sleep(5)
-                    DQ_APP.run_expectation(checks_input)
+                    expectation_result = DQ_APP.run_checks(checks_input)
                     st.success('Your test has successfully been run! Get results')
 
                     with st.expander("Show Results"):
-                        st.subheader("Data Quality Check batch")
-                        batch_result = DQ_APP.configure_datasource()
-                        st.write(batch_result)
+                        st.subheader("Data Quality Checkpoint result")
+                        st.write(expectation_result)
 
             open_docs_button = st.button("Open Data Docs")
             if open_docs_button:

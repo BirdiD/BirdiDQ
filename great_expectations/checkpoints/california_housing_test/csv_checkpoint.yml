@@ -3,7 +3,7 @@ config_version: 1.0
 template_name:
 module_name: great_expectations.checkpoint
 class_name: SimpleCheckpoint
-run_name_template: '%Y%m%d-%H%M%S'
+run_name_template:
 expectation_suite_name:
 batch_request: {}
 action_list:
@@ -18,7 +18,13 @@ action_list:
       class_name: UpdateDataDocsAction
 evaluation_parameters: {}
 runtime_configuration: {}
-validations: []
+validations:
+  - batch_request:
+      datasource_name: california_housing_test.csv
+      data_asset_name: california_housing_test.csv_2023-06-19
+      options: {}
+      batch_slice:
+    expectation_suite_name: california_housing_test.csv_expectation_suite
 profilers: []
 ge_cloud_id:
 expectation_suite_ge_cloud_id:

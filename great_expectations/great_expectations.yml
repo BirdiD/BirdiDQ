@@ -16,29 +16,17 @@ config_version: 3.0
 datasources:
   birdi:
     execution_engine:
-      module_name: great_expectations.execution_engine
       class_name: PandasExecutionEngine
+      module_name: great_expectations.execution_engine
+    class_name: Datasource
+    module_name: great_expectations.datasource
     data_connectors:
       runtime_connector:
         batch_identifiers:
           - run_id
-        module_name: great_expectations.datasource.data_connector
         class_name: RuntimeDataConnector
+        module_name: great_expectations.datasource.data_connector
         name: runtime_connector
-    module_name: great_expectations.datasource
-    class_name: Datasource
-  california_housing_test.csv:
-    execution_engine:
-      module_name: great_expectations.execution_engine
-      class_name: PandasExecutionEngine
-    data_connectors:
-      runtime_connector:
-        batch_identifiers:
-          - run_id
-        module_name: great_expectations.datasource.data_connector
-        class_name: RuntimeDataConnector
-    module_name: great_expectations.datasource
-    class_name: Datasource
 config_variables_file_path: uncommitted/config_variables.yml
 
 # The plugins_directory will be added to your python path for custom modules
@@ -104,7 +92,14 @@ anonymous_usage_statistics:
   data_context_id: 4515a326-15a3-497d-bf64-d56ab78839e8
   enabled: true
 include_rendered_content:
-  globally: false
   expectation_validation_result: false
   expectation_suite: false
+  globally: false
 notebooks:
+fluent_datasources:
+  california_housing_test.csv:
+    type: pandas
+    assets:
+      california_housing_test.csv_2023-06-19:
+        type: dataframe
+        batch_metadata: {}

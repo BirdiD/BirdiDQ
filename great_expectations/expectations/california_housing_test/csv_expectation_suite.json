@@ -5,9 +5,9 @@
     {
       "expectation_type": "expect_column_values_to_not_be_null",
       "kwargs": {
-        "column": "total_rooms",
+        "column": "population",
         "condition_parser": "pandas",
-        "row_condition": "latitude<=500"
+        "row_condition": "population<=500"
       },
       "meta": {}
     }
