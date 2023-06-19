@@ -48,7 +48,7 @@ def display_test_result(result):
         st.write("No partial unexpected values found.")
 
 report = {
-    "Success": True,
+    "Success": False,
     "Expectation Type": "expect_column_values_to_not_be_null",
     "Element Count": 305,
     "Unexpected Count": 0,

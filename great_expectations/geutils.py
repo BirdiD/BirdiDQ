@@ -146,11 +146,18 @@ class DataQuality():
         Run your dataquality checks here
         """
         validator, batch_request = self.get_validator()
-
+        def my_function(expectation, validator):
+            local_vars = {"validator": validator}
+            exec(f"expectation_result = validator.{expectation}", globals(), local_vars)
+            return local_vars.get("expectation_result")
+        
+        expectation_result = my_function(expectation, validator)
         exec(f"expectation_result = validator.{expectation}")
 
         validator.save_expectation_suite(discard_failed_expectations=False)
         self.run_ge_checkpoint(batch_request)
+        
+        return expectation_result
     
     def add_or_update_ge_checkpoint(self):
         """
