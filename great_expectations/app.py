@@ -7,6 +7,7 @@ import pandas as pd
 import time
 import webbrowser
 from geutils import DataQuality
+from utils import get_mapping
 
 
 def display_test_result(result):
@@ -28,28 +29,32 @@ def display_test_result(result):
         st.error('Test failed. View data docs for more details', icon="🚨")
 
     # Create data for the bar chart
-    labels = ['Element Count', 'Unexpected Count', 'Unexpected Percent']
-    values = [result['result']['element_count'], result['result']['unexpected_count'], result['result']['unexpected_percent']]
-    colors = ['lightskyblue', 'lightcoral', 'lightgreen']
+    try:
+        labels = ['Element Count', 'Unexpected Count', 'Unexpected Percent']
+        values = [result['result']['element_count'], result['result']['unexpected_count'], result['result']['unexpected_percent']]
+        colors = ['lightskyblue', 'lightcoral', 'lightgreen']
 
-    # Create a bar chart using Plotly
-    fig = go.Figure(data=go.Bar(x=labels, y=values, marker=dict(color=colors)))
-    fig.update_layout(title='Data Quality Test Results', xaxis_title='Metrics', yaxis_title='Values')
+        # Create a bar chart using Plotly
+        fig = go.Figure(data=go.Bar(x=labels, y=values, marker=dict(color=colors)))
+        fig.update_layout(title='Data Quality Test Results', xaxis_title='Metrics', yaxis_title='Values')
 
-    # Display the bar chart using Streamlit's Plotly support
-    st.plotly_chart(fig)
+        # Display the bar chart using Streamlit's Plotly support
+        st.plotly_chart(fig)
 
-    # Display other details of the report
-    st.subheader("Expectation Type")
-    st.write(result['expectation_config']["expectation_type"])
+        # Display other details of the report
+        st.subheader("Expectation Type")
+        st.write(result['expectation_config']["expectation_type"])
 
-    st.subheader("Partial Unexpected List")
-    partial_unexpected_list = result['result']["partial_unexpected_list"]
-    if partial_unexpected_list:
-        for item in partial_unexpected_list:
-            st.write(item)
-    else:
-        st.write("No partial unexpected values found.")
+        st.subheader("Partial Unexpected List")
+        partial_unexpected_list = result['result']["partial_unexpected_list"]
+        if partial_unexpected_list:
+            for item in partial_unexpected_list:
+                st.write(item)
+        else:
+            st.write("No partial unexpected values found.")
+    except:
+        pass
+    
 
 
 def main():
@@ -58,7 +63,9 @@ def main():
 
     # Step 4: Implement the app components
     # Select the data source
-    data_source = st.selectbox("Select the data source", ["", "california_housing_test.csv", "dataset1.csv", "dataset2.csv", "dataset3.csv"])
+    mapping = get_mapping('great_expectations/data/')
+    datasources = list(mapping.keys())
+    data_source = st.selectbox("Select the data source", [""]+datasources)
 
     DQ_APP = None  # Initialize DQ_APP object
 
@@ -66,10 +73,12 @@ def main():
     if data_source:
         # Display a preview of the data
         st.subheader("Preview of the data:")
-        data = pd.read_csv(f"great_expectations/data/{data_source}")
-        filtered_df = dataframe_explorer(data, case=False)
-        st.dataframe(filtered_df, use_container_width=True)
-        #st.write(data.head())
+        try:
+            data = pd.read_csv(f"great_expectations/data/{mapping.get(data_source, None)}")
+            filtered_df = dataframe_explorer(data, case=False)
+            st.dataframe(filtered_df, use_container_width=True)
+        except:
+            raise Exception("Sorry, no numbers below zero")
 
         if DQ_APP is None:  # Create DQ_APP object if not already created
             DQ_APP = DataQuality(data_source, data)
