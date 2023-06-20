@@ -12,4 +12,3 @@ def get_mapping(folder_path):
 
     return mapping_dict
    
-print(list(get_mapping('great_expectations/data/').keys()))
