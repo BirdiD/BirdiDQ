@@ -3,9 +3,9 @@
   "expectation_suite_name": "California_housing_test_expectation_suite",
   "expectations": [
     {
-      "expectation_type": "expect_column_to_exist",
+      "expectation_type": "expect_column_values_to_not_be_null",
       "kwargs": {
-        "column": "total_rooms"
+        "column": "latitude"
       },
       "meta": {}
     }

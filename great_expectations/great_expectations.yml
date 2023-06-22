@@ -15,29 +15,29 @@ config_version: 3.0
 # add a new datasource. Read more at https://docs.greatexpectations.io/docs/guides/connecting_to_your_data/connect_to_data_overview
 datasources:
   california_housing_test.csv:
-    module_name: great_expectations.datasource
     execution_engine:
-      class_name: PandasExecutionEngine
       module_name: great_expectations.execution_engine
+      class_name: PandasExecutionEngine
     data_connectors:
       runtime_connector:
-        module_name: great_expectations.datasource.data_connector
         batch_identifiers:
           - run_id
-        class_name: RuntimeDataConnector
         name: runtime_connector
+        module_name: great_expectations.datasource.data_connector
+        class_name: RuntimeDataConnector
+    module_name: great_expectations.datasource
     class_name: Datasource
   California_housing_test:
-    module_name: great_expectations.datasource
     execution_engine:
-      class_name: PandasExecutionEngine
       module_name: great_expectations.execution_engine
+      class_name: PandasExecutionEngine
     data_connectors:
       runtime_connector:
-        module_name: great_expectations.datasource.data_connector
         batch_identifiers:
           - run_id
+        module_name: great_expectations.datasource.data_connector
         class_name: RuntimeDataConnector
+    module_name: great_expectations.datasource
     class_name: Datasource
 config_variables_file_path: uncommitted/config_variables.yml
 
@@ -105,6 +105,6 @@ anonymous_usage_statistics:
   data_context_id: bec5a6ba-547f-44a8-a5f5-09d35c2833b6
 include_rendered_content:
   expectation_suite: false
-  expectation_validation_result: false
   globally: false
+  expectation_validation_result: false
 notebooks:
