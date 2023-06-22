@@ -1,0 +1,33 @@
+/* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F5F5F5;
+}
+
+.sidebar .sidebar-content {
+    background-color: #21409d;
+    color: #FFFFFF;
+}
+
+.sidebar .sidebar-content h1,
+.sidebar .sidebar-content h2,
+.sidebar .sidebar-content h3 {
+    color: #FFFFFF;
+}
+
+.main .block-container {
+    padding: 20px;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0px 2px 4px rgba(57, 52, 52, 0.1);
+}
+
+.main h1,
+.main h2,
+.main h3,
+.main h4,
+.main h5,
+.main h6 {
+    color: #283593;
+}

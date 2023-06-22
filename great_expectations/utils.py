@@ -1,8 +1,17 @@
 import os
 from dotenv import load_dotenv
 import openai
+import streamlit as st
 load_dotenv('.env')
 
+
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+def remote_css(url):
+    st.markdown(f'<link href="{url}" rel="stylesheet">', unsafe_allow_html=True)
+    
 def get_mapping(folder_path):
 
     mapping_dict = {}
@@ -15,13 +24,12 @@ def get_mapping(folder_path):
 
     return mapping_dict
 
-def nltoge():
+def naturallanguagetoexpectation(sentence):
     """
     Convert Natural Lnaguage Query to GE expectation checks
     """
     ftmodel = "davinci:ft-personal-2023-06-22-11-04-40"
-
-    prompt = "Can you check that the column username is not null for rows having 'FR' value in the countrycode column?\n\n###\n\n"
+    prompt = f"{sentence}\n\n###\n\n"
     response = openai.Completion.create(
     model=ftmodel,
     prompt=prompt,

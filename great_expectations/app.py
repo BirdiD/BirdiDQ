@@ -7,7 +7,7 @@ import pandas as pd
 import time
 import webbrowser
 from geutils import DataQuality
-from utils import get_mapping
+from utils import *
 
 
 def display_test_result(result):
@@ -54,13 +54,25 @@ def display_test_result(result):
             st.write("No partial unexpected values found.")
     except:
         pass
-    
+
+st.set_page_config(
+    page_title="BirdiDQ",
+    page_icon="❄️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)  
+st.title("❄️ BirdiDQ")
+st.markdown('<h1 style="font-size: 24px; font-weight: bold; margin-bottom: 0;">Welcome to your DQ App</h1>', unsafe_allow_html=True)
+
+with open("great_expectations/ui/side.md", "r") as sidebar_file:
+    sidebar_content = sidebar_file.read()
+
+# Display the DDL for the selected table
+st.sidebar.markdown(sidebar_content, unsafe_allow_html=True)
 
 
 def main():
     # Set the app title
-    st.title("Data Quality APP")
-
     # Step 4: Implement the app components
     # Select the data source
     mapping = get_mapping('great_expectations/data/')
@@ -93,7 +105,9 @@ def main():
             if submit_button:
                 with st.spinner('Running your data quality checks'):
                     time.sleep(5)
-                    expectation_result = DQ_APP.run_expectation(checks_input)
+                    nltoge = naturallanguagetoexpectation(checks_input)
+                    #st.write(nltoge)
+                    expectation_result = DQ_APP.run_expectation(nltoge)
                     #print(expectation_result.to_json_dict())
                     st.success('Your test has successfully been run! Get results')
                     with st.expander("Show Results"):
@@ -112,6 +126,10 @@ def main():
                 # Open the URL in the browser
                 webbrowser.open_new_tab(data_docs_url)
 
+#local_css("great_expectations/ui/frontend.css")
+local_css("great_expectations/ui/front.css")
+remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+remote_css('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700&display=swap')
 # Run the app
 if __name__ == "__main__":
     main()

@@ -35,6 +35,19 @@ datasources:
       runtime_connector:
         batch_identifiers:
           - run_id
+        name: runtime_connector
+        module_name: great_expectations.datasource.data_connector
+        class_name: RuntimeDataConnector
+    module_name: great_expectations.datasource
+    class_name: Datasource
+  Users:
+    execution_engine:
+      module_name: great_expectations.execution_engine
+      class_name: PandasExecutionEngine
+    data_connectors:
+      runtime_connector:
+        batch_identifiers:
+          - run_id
         module_name: great_expectations.datasource.data_connector
         class_name: RuntimeDataConnector
     module_name: great_expectations.datasource
