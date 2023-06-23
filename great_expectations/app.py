@@ -1,59 +1,11 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import plotly.graph_objects as go
-from streamlit_extras.let_it_rain import rain
 from streamlit_extras.dataframe_explorer import dataframe_explorer
 import pandas as pd
 import time
 import webbrowser
 from geutils import DataQuality
 from utils import *
-
-
-def display_test_result(result):
-    """
-    Display GE json expectation output
-    """
-    # Check if the test was successful
-    success = result["success"]
-
-    # Display the test result box
-    if success:
-        st.success('Your data quality test succeeded!', icon="✅")
-        rain(emoji="🎈",
-             font_size=54,
-             falling_speed=5,
-             animation_length="infinite",
-            )
-    else:
-        st.error('Test failed. View data docs for more details', icon="🚨")
-
-    # Create data for the bar chart
-    try:
-        labels = ['Element Count', 'Unexpected Count', 'Unexpected Percent']
-        values = [result['result']['element_count'], result['result']['unexpected_count'], result['result']['unexpected_percent']]
-        colors = ['lightskyblue', 'lightcoral', 'lightgreen']
-
-        # Create a bar chart using Plotly
-        fig = go.Figure(data=go.Bar(x=labels, y=values, marker=dict(color=colors)))
-        fig.update_layout(title='Data Quality Test Results', xaxis_title='Metrics', yaxis_title='Values')
-
-        # Display the bar chart using Streamlit's Plotly support
-        st.plotly_chart(fig)
-
-        # Display other details of the report
-        st.subheader("Expectation Type")
-        st.write(result['expectation_config']["expectation_type"])
-
-        st.subheader("Partial Unexpected List")
-        partial_unexpected_list = result['result']["partial_unexpected_list"]
-        if partial_unexpected_list:
-            for item in partial_unexpected_list:
-                st.write(item)
-        else:
-            st.write("No partial unexpected values found.")
-    except:
-        pass
 
 st.set_page_config(
     page_title="BirdiDQ",
@@ -73,7 +25,9 @@ st.sidebar.markdown(sidebar_content, unsafe_allow_html=True)
 
 def main():
     # Set the app title
-    # Step 4: Implement the app components
+    session_state = st.session_state
+    if 'page' not in session_state:
+        session_state['page'] = 'home'
     # Select the data source
     mapping = get_mapping('great_expectations/data/')
     datasources = list(mapping.keys())
@@ -97,7 +51,8 @@ def main():
         # Perform data quality checks
         st.subheader("Perform Data Quality Checks")
 
-        checks_input = st.text_area("Describe the checks you want to perform")
+        checks_input = st.text_area("Describe the checks you want to perform",
+                                    placeholder="For instance:  'Check that none of the values in the address column match the pattern for an address starting with a digit'. \n Provide the accurate column name as in the example.")
 
         # Button to get started
         if checks_input:
@@ -105,28 +60,46 @@ def main():
             if submit_button:
                 with st.spinner('Running your data quality checks'):
                     time.sleep(5)
-                    nltoge = naturallanguagetoexpectation(checks_input)
+                    #nltoge = naturallanguagetoexpectation(checks_input)
                     #st.write(nltoge)
-                    expectation_result = DQ_APP.run_expectation(nltoge)
+                    expectation_result = DQ_APP.run_expectation(checks_input)
                     #print(expectation_result.to_json_dict())
                     st.success('Your test has successfully been run! Get results')
                     with st.expander("Show Results"):
                         st.subheader("Data Quality result")
                         display_test_result(expectation_result.to_json_dict())
+            
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                open_docs_button = st.button("Open Data Docs")
+                if open_docs_button:
+                    # Get the URL to the Data Docs
+                    data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
+                    st.write(data_docs_url)
 
-            open_docs_button = st.button("Open Data Docs")
-            if open_docs_button:
-                st.write("Open button clicked")
-                #DQ_APP.get_data_docs()
+                    # Open the URL in the browser
+                    webbrowser.open_new_tab(data_docs_url)
+            
+            with col2:
+                if session_state['page'] == 'home':
+                        data_owner_button = st.button("Contact Data Owner")
+                        if data_owner_button:
+                            session_state['page'] = 'contact_form'
 
-                # Get the URL to the Data Docs
-                data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
-                st.write(data_docs_url)
+                if session_state['page'] == 'contact_form':
+                        st.header("Contact Form")
+                        sender_email = "annotepulaar@gmail.com"
+                        recipient_email = st.text_input("Recipient Email")
+                        subject = st.text_input("Subject")
+                        message = st.text_area("Message")
+                        attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
+                        if st.button("Send Email"):
+                            send_email_with_attachment(sender_email, recipient_email, subject, message, attachement)
+                            session_state['page'] = 'email_sent'
+                            
+            if session_state['page'] == 'email_sent':
+                session_state['page'] = 'home'
 
-                # Open the URL in the browser
-                webbrowser.open_new_tab(data_docs_url)
-
-#local_css("great_expectations/ui/frontend.css")
 local_css("great_expectations/ui/front.css")
 remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 remote_css('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700&display=swap')

@@ -3,14 +3,9 @@
   "expectation_suite_name": "Users_expectation_suite",
   "expectations": [
     {
-      "expectation_type": "expect_column_values_to_be_in_set",
+      "expectation_type": "expect_column_values_to_not_be_null",
       "kwargs": {
-        "column": "subscriptionStatus",
-        "condition_parser": "pandas",
-        "row_condition": "hasActiveSubscription==True",
-        "value_set": [
-          "Active"
-        ]
+        "column": "title"
       },
       "meta": {}
     }
