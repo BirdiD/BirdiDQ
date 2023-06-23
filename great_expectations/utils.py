@@ -9,6 +9,9 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 load_dotenv(find_dotenv())
+# Get your SendGrid API key from the environment variable
+sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
+openai.api_key  = os.environ.get("OPENAI_API_KEY")
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
@@ -56,9 +59,6 @@ def display_test_result(result):
             st.write("No partial unexpected values found.")
     except:
         pass
-
-# Get your SendGrid API key from the environment variable
-sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
 
 def send_email_with_attachment(sender_email, recipient_email, subject, message, attachment_path):
     # Create the SendGrid email message
@@ -108,14 +108,15 @@ def remote_css(url):
 def get_mapping(folder_path):
 
     mapping_dict = {}
-
+    data_owners = {}
     for file_name in os.listdir(folder_path):
         if file_name.endswith('.csv'):
             name_without_extension = os.path.splitext(file_name)[0]
             name_with_uppercase = name_without_extension.capitalize()
             mapping_dict[name_with_uppercase] = file_name
+            data_owners[name_with_uppercase] = "dioula01@gmail.com"
+    return mapping_dict, data_owners
 
-    return mapping_dict
 
 def naturallanguagetoexpectation(sentence):
     """

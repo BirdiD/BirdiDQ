@@ -29,7 +29,7 @@ def main():
     if 'page' not in session_state:
         session_state['page'] = 'home'
     # Select the data source
-    mapping = get_mapping('great_expectations/data/')
+    mapping, data_owners = get_mapping('great_expectations/data/')
     datasources = list(mapping.keys())
     data_source = st.selectbox("Select the data source", [""]+datasources)
 
@@ -60,9 +60,9 @@ def main():
             if submit_button:
                 with st.spinner('Running your data quality checks'):
                     time.sleep(5)
-                    #nltoge = naturallanguagetoexpectation(checks_input)
+                    nltoge = naturallanguagetoexpectation(checks_input)
                     #st.write(nltoge)
-                    expectation_result = DQ_APP.run_expectation(checks_input)
+                    expectation_result = DQ_APP.run_expectation(nltoge)
                     #print(expectation_result.to_json_dict())
                     st.success('Your test has successfully been run! Get results')
                     with st.expander("Show Results"):
@@ -89,7 +89,7 @@ def main():
                 if session_state['page'] == 'contact_form':
                         st.header("Contact Form")
                         sender_email = "annotepulaar@gmail.com"
-                        recipient_email = st.text_input("Recipient Email")
+                        recipient_email = st.text_input("Recipient Email", value=data_owners[data_source])
                         subject = st.text_input("Subject")
                         message = st.text_area("Message")
                         attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
