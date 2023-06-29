@@ -60,15 +60,17 @@ def main():
             if submit_button:
                 with st.spinner('Running your data quality checks'):
                     time.sleep(5)
-                    nltoge = naturallanguagetoexpectation(checks_input)
-                    #st.write(nltoge)
-                    expectation_result = DQ_APP.run_expectation(nltoge)
-                    #print(expectation_result.to_json_dict())
-                    st.success('Your test has successfully been run! Get results')
-                    with st.expander("Show Results"):
-                        st.subheader("Data Quality result")
-                        display_test_result(expectation_result.to_json_dict())
-            
+                    try:
+                        nltoge = naturallanguagetoexpectation(checks_input)
+                        #st.write(nltoge)
+                        expectation_result = DQ_APP.run_expectation(nltoge)
+                        #print(expectation_result.to_json_dict())
+                        st.success('Your test has successfully been run! Get results')
+                        with st.expander("Show Results"):
+                            st.subheader("Data Quality result")
+                            display_test_result(expectation_result.to_json_dict())
+                    except:
+                        st.write("Please rephrase sentence")
             col1, col2 = st.columns([1, 1])
             with col1:
                 open_docs_button = st.button("Open Data Docs")
