@@ -2,6 +2,8 @@
 
 BirdiDQ is an intuitive and user-friendly data quality application that allows you to run data quality checks on top of python great expectation open source library using natural language queries. Type in your requests, and BirdiDQ will generate the appropriate GE method, run the quality control and return the results along with data docs you need. 
 
+# Note 
+BirdiDQ is under development and is an open source project. Contributions are welcomed!
 ## Features
 
 - **🔍 Data Exploration Made Easy:** Quickly and interactively explore your data using a range of features like filters, comparisons, and more. Uncover hidden insights and make informed decisions with confidence.
