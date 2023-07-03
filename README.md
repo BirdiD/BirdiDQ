@@ -19,7 +19,6 @@ This app is an LLM-powered app built using:
 - **Finetuned LLMs**:
     - **[Falcon-7B parameters causal decoder-only model](https://huggingface.co/tiiuae/falcon-7b)**: The model is finetuned on custom data with **Qlora** approach.
     - **[OpenAI GPT-3](https://platform.openai.com/docs/guides/fine-tuning)**: Also finetuned on the same data
-- **Note**: The finetuned GPT-3 model seems to perform better for now.
 # Queries example
 
 Here are some example queries you can try with BirdiDQ:
