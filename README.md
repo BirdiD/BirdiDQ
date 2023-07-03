@@ -2,7 +2,10 @@
 
 BirdiDQ is an intuitive and user-friendly data quality application that allows you to run data quality checks on top of python great expectation open source library using natural language queries. Type in your requests, and BirdiDQ will generate the appropriate GE method, run the quality control and return the results along with data docs you need. 
 
-## Features
+# Note
+BirdiDQ is under development and is an open source project. Contributions are welcomed!
+
+# Features
 
 - **🔍 Data Exploration Made Easy:** Quickly and interactively explore your data using a range of features like filters, comparisons, and more. Uncover hidden insights and make informed decisions with confidence.
 - **🎯 Natural Language Processing:**: Speak BirdiDQ's language! No technical expertise required. Simply type in your queries, and BirdiDQ intelligently converts them into powerful Great Expectations methods (using a fine-tuned Large Language Model), saving you time and effort..
@@ -17,7 +20,6 @@ This app is an LLM-powered app built using:
 - **Finetuned LLMs**:
     - **[Falcon-7B parameters causal decoder-only model](https://huggingface.co/tiiuae/falcon-7b)**: The model is finetuned on custom data with **Qlora** approach.
     - **[OpenAI GPT-3](https://platform.openai.com/docs/guides/fine-tuning)**: Also finetuned on the same data
-- **Note**: The finetuned GPT-3 model seems to perform better for now.
 ## Queries example
 
 Here are some example queries you can try with BirdiDQ:
