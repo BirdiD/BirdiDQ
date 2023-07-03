@@ -7,7 +7,6 @@ import plotly.graph_objects as go
 from streamlit_extras.let_it_rain import rain
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-from transformers import AutoModelForCausalLM
 
 load_dotenv(find_dotenv())
 # Get your SendGrid API key from the environment variable
