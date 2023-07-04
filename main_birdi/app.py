@@ -1,11 +1,11 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from streamlit_extras import *
 import pandas as pd
 import time
 import webbrowser
 from utils import * 
 from geutils import DataQuality
+from streamlit_extras.dataframe_explorer import dataframe_explorer
 
 
 st.set_page_config(
