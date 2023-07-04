@@ -63,7 +63,7 @@ def main():
                     time.sleep(5)
                     try:
                         nltoge = naturallanguagetoexpectation(checks_input)
-                        #st.write(nltoge)
+                        st.write(nltoge)
                         expectation_result = DQ_APP.run_expectation(nltoge)
                         #print(expectation_result.to_json_dict())
                         st.success('Your test has successfully been run! Get results')
