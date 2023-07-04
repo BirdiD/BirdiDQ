@@ -4,7 +4,7 @@ from dotenv import load_dotenv, find_dotenv
 import openai
 import streamlit as st
 import plotly.graph_objects as go
-from streamlit_extras.let_it_rain import rain
+from streamlit_extras import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
