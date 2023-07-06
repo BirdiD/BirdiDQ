@@ -1,11 +1,12 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from streamlit_extras.dataframe_explorer import dataframe_explorer
 import pandas as pd
 import time
 import webbrowser
+from utils import * 
 from geutils import DataQuality
-from utils import *
+from streamlit_extras.dataframe_explorer import dataframe_explorer
+
 
 st.set_page_config(
     page_title="BirdiDQ",
@@ -16,7 +17,7 @@ st.set_page_config(
 st.title("❄️ BirdiDQ")
 st.markdown('<h1 style="font-size: 24px; font-weight: bold; margin-bottom: 0;">Welcome to your DQ App</h1>', unsafe_allow_html=True)
 
-with open("great_expectations/ui/side.md", "r") as sidebar_file:
+with open("main_birdi/ui/side.md", "r") as sidebar_file:
     sidebar_content = sidebar_file.read()
 
 # Display the DDL for the selected table
@@ -29,7 +30,7 @@ def main():
     if 'page' not in session_state:
         session_state['page'] = 'home'
     # Select the data source
-    mapping, data_owners = get_mapping('great_expectations/data/')
+    mapping, data_owners = get_mapping('main_birdi/data/')
     datasources = list(mapping.keys())
     data_source = st.selectbox("Select the data source", [""]+datasources)
 
@@ -40,7 +41,7 @@ def main():
         # Display a preview of the data
         st.subheader("Preview of the data:")
         try:
-            data = pd.read_csv(f"great_expectations/data/{mapping.get(data_source, None)}")
+            data = pd.read_csv(f"main_birdi/data/{mapping.get(data_source, None)}")
             filtered_df = dataframe_explorer(data, case=False)
             st.dataframe(filtered_df, use_container_width=True)
         except:
@@ -62,7 +63,7 @@ def main():
                     time.sleep(5)
                     try:
                         nltoge = naturallanguagetoexpectation(checks_input)
-                        #st.write(nltoge)
+                        st.write(nltoge)
                         expectation_result = DQ_APP.run_expectation(nltoge)
                         #print(expectation_result.to_json_dict())
                         st.success('Your test has successfully been run! Get results')
@@ -94,7 +95,7 @@ def main():
                         recipient_email = st.text_input("Recipient Email", value=data_owners[data_source])
                         subject = st.text_input("Subject")
                         message = st.text_area("Message")
-                        attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
+                        attachement = "main_birdi/uncommitted/data_docs/local_site/index.html"
                         if st.button("Send Email"):
                             send_email_with_attachment(sender_email, recipient_email, subject, message, attachement)
                             session_state['page'] = 'email_sent'
@@ -102,7 +103,7 @@ def main():
             if session_state['page'] == 'email_sent':
                 session_state['page'] = 'home'
 
-local_css("great_expectations/ui/front.css")
+local_css("main_birdi/ui/front.css")
 remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 remote_css('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700&display=swap')
 # Run the app
