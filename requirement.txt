@@ -1,0 +1,11 @@
+great_expectations
+transformers
+peft
+torch
+einops
+safetensors
+streamlit
+streamlit_extras
+openai
+plotly
+python_dotenv
