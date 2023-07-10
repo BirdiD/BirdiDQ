@@ -9,3 +9,4 @@ streamlit_extras
 openai
 plotly
 python_dotenv
+sendgrid
