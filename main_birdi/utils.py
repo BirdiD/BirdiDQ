@@ -13,7 +13,8 @@ ssl._create_default_https_context = ssl._create_unverified_context
 load_dotenv(find_dotenv())
 # Get your SendGrid API key from the environment variable
 sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
-print(sendgrid_api_key)
+
+
 def display_test_result(result):
     """
     Display GE json expectation output

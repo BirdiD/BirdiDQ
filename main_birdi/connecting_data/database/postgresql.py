@@ -1,21 +1,52 @@
 import great_expectations as ge
-import datetime
-from great_expectations.core.batch import RuntimeBatchRequest
-from great_expectations.checkpoint.checkpoint import SimpleCheckpoint
 from ruamel import yaml
 import ruamel
+from great_expectations.core.batch import BatchRequest, RuntimeBatchRequest
+from great_expectations.checkpoint.checkpoint import SimpleCheckpoint
+from dotenv import load_dotenv, find_dotenv
+import os 
+import psycopg2
+from sqlalchemy import create_engine
+import pandas as pd 
 
-class DataQuality():
+load_dotenv(find_dotenv())
 
-    def __init__(self, datasource_name, dataframe):
+# Get your postgresql connection string from the environment variable
+POSTGRES_CONNECTION_STRING = os.environ.get('POSTGRES_CONNECTION_STRING')
+
+def read_pg_tables(table_name):
+    """
+    Read postgresql table in pandas dataframe
+    """
+    engine = create_engine(POSTGRES_CONNECTION_STRING)
+    df = pd.read_sql_query(f'select * from {table_name}',con=engine)
+    return df
+
+def get_pg_tables():
+    """
+    List all tables from a PostgreSQL database using a connection string
+    """
+    conn = psycopg2.connect(POSTGRES_CONNECTION_STRING)
+    cursor = conn.cursor()
+
+    query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"
+    cursor.execute(query)
+
+    tables = cursor.fetchall()
+    tables = [t[0] for t in tables]
+    cursor.close()
+    conn.close()
+    return tables
+
+class PostgreSQLDatasource():
+    def __init__(self, database, asset_name):
         """ 
         create great expectations context and default runtime datasource
         """
-        self.datasource_name = datasource_name
-        self.expectation_suite_name = f"{datasource_name}_expectation_suite"
-        self.checkpoint_name = f"{datasource_name}_checkpoint"
-        self.dataframe = dataframe
-        self.partition_date = datetime.datetime.now()
+        self.database = database
+        self.asset_name = asset_name
+        self.expectation_suite_name = f"{asset_name}_expectation_suite"
+        self.checkpoint_name = f"{asset_name}_checkpoint"
         self.context = ge.get_context()
 
     def add_or_update_datasource(self):
@@ -23,36 +54,41 @@ class DataQuality():
         Create data source if it does not exist or updating existing one
         """
         datasource_yaml = rf"""
-        name: {self.datasource_name}
+        name: {self.database}
         class_name: Datasource
         execution_engine:
-            class_name: PandasExecutionEngine
+            class_name: SqlAlchemyExecutionEngine
+            connection_string: {POSTGRES_CONNECTION_STRING}
         data_connectors:
-            runtime_connector:
+            default_runtime_data_connector_name:
                 class_name: RuntimeDataConnector
                 batch_identifiers:
-                    - run_id
+                    - default_identifier_name
+            default_inferred_data_connector_name:
+                class_name: InferredAssetSqlDataConnector
+                include_schema_name: true
         """
         self.context.test_yaml_config(datasource_yaml)
         self.context.add_datasource(**yaml.load(datasource_yaml, Loader=ruamel.yaml.Loader))
 
     def configure_datasource(self):
         """
-        Add a RuntimeDataConnector hat uses an in-memory DataFrame to a Datasource configuration
+        Add a RuntimeDataConnector
         """
         batch_request = RuntimeBatchRequest(
-            datasource_name= self.datasource_name,
-            data_connector_name= "runtime_connector",
-            data_asset_name=f"{self.datasource_name}_{self.partition_date.strftime('%Y%m%d')}",
-            batch_identifiers={
-                "run_id": f'''
-                {self.datasource_name}_partition_date={self.partition_date.strftime('%Y%m%d')}
-                ''',
-            },
-            runtime_parameters={"batch_data": self.dataframe}
+            datasource_name=self.database,
+            data_connector_name="default_runtime_data_connector_name",
+            data_asset_name=self.asset_name,  # this can be anything that identifies this data
+            runtime_parameters={"query": f"SELECT * from public.{self.asset_name} LIMIT 10"},
+            batch_identifiers={"default_identifier_name": "default_identifier"},
         )
+        # batch_request = BatchRequest(
+        #     datasource_name=self.database,
+        #     data_connector_name="default_inferred_data_connector_name",
+        #     data_asset_name=f"public.{self.asset_name}", 
+        # )
         return batch_request
-    
+
     def add_or_update_ge_suite(self):
         """
         create expectation suite if not exist and update it if there is already a suite
@@ -71,7 +107,7 @@ class DataQuality():
                                                expectation_suite_name=self.expectation_suite_name,
                                         )
         return validator, batch_request
-    
+
     def run_expectation(self, expectation):
         """
         Run your dataquality checks here
@@ -87,7 +123,6 @@ class DataQuality():
 
         validator.save_expectation_suite(discard_failed_expectations=False)
         self.run_ge_checkpoint(batch_request)
-        
         return expectation_result
     
     def add_or_update_ge_checkpoint(self):
@@ -112,8 +147,16 @@ class DataQuality():
                 checkpoint_name = self.checkpoint_name,
                 validations=[
                             {
-                             "batch_request": batch_request,
+                            "batch_request": batch_request,
                             "expectation_suite_name": self.expectation_suite_name,
                             }
                             ],
                 )
+
+dabatabase = "translation_db"
+asset_name = "users"
+dq = PostgreSQLDatasource(dabatabase, asset_name)
+result = dq.run_expectation("expect_column_values_to_not_be_null(column='email')")
+print(result)
+
+
