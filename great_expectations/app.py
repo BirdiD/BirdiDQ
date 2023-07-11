@@ -4,7 +4,7 @@ import pandas as pd
 import time
 import webbrowser
 from models.gpt_model import naturallanguagetoexpectation
-from utils import * 
+from helpers.utils import * 
 from connecting_data.filesystem.pandas_filesystem import DataQuality
 from streamlit_extras.dataframe_explorer import dataframe_explorer
 
