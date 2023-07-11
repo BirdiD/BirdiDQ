@@ -153,10 +153,4 @@ class PostgreSQLDatasource():
                             ],
                 )
 
-dabatabase = "translation_db"
-asset_name = "users"
-dq = PostgreSQLDatasource(dabatabase, asset_name)
-result = dq.run_expectation("expect_column_values_to_not_be_null(column='email')")
-print(result)
-
 
