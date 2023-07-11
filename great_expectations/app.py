@@ -5,6 +5,7 @@ import time
 import webbrowser
 from models.gpt_model import naturallanguagetoexpectation
 from helpers.utils import * 
+from connecting_data.database.postgresql import *
 from connecting_data.filesystem.pandas_filesystem import DataQuality
 from streamlit_extras.dataframe_explorer import dataframe_explorer
 
@@ -31,78 +32,97 @@ def main():
     if 'page' not in session_state:
         session_state['page'] = 'home'
     # Select the data source
-    mapping, data_owners = get_mapping('great_expectations/data/')
-    datasources = list(mapping.keys())
-    data_source = st.selectbox("Select the data source", [""]+datasources)
-
+    connecting_data_list = ['','Local File System','PostgreSQL']
+    connecting_data = st.selectbox("Select your data connector", connecting_data_list)
+    
     DQ_APP = None  # Initialize DQ_APP object
-
     checks_input = None  # Initialize checks_input variable
-    if data_source:
-        # Display a preview of the data
-        st.subheader("Preview of the data:")
-        try:
-            data = pd.read_csv(f"great_expectations/data/{mapping.get(data_source, None)}")
-            filtered_df = dataframe_explorer(data, case=False)
-            st.dataframe(filtered_df, use_container_width=True)
-        except:
-            raise Exception("Sorry, no numbers below zero")
 
-        if DQ_APP is None:  # Create DQ_APP object if not already created
-            DQ_APP = DataQuality(data_source, data)
-        # Perform data quality checks
-        st.subheader("Perform Data Quality Checks")
+    if connecting_data=='Local File System':
+        mapping, data_owners = get_mapping('great_expectations/data/')
+        datasources = list(mapping.keys())
+        data_source = st.selectbox("Select table name", [""]+datasources)
 
-        checks_input = st.text_area("Describe the checks you want to perform",
-                                    placeholder="For instance:  'Check that none of the values in the address column match the pattern for an address starting with a digit'. \n Provide the accurate column name as in the example.")
+        if data_source:
+            # Display a preview of the data
+            st.subheader("Preview of the data:")
+            try:
+                data = pd.read_csv(f"great_expectations/data/{mapping.get(data_source, None)}")
+                filtered_df = dataframe_explorer(data, case=False)
+                st.dataframe(filtered_df, use_container_width=True)
+            except:
+                raise Exception("Sorry, no numbers below zero")
 
-        # Button to get started
-        if checks_input:
-            submit_button = st.button("Submit")
-            if submit_button:
-                with st.spinner('Running your data quality checks'):
-                    time.sleep(5)
-                    try:
-                        nltoge = naturallanguagetoexpectation(checks_input)
-                        st.write(nltoge)
-                        expectation_result = DQ_APP.run_expectation(nltoge)
-                        #print(expectation_result.to_json_dict())
-                        st.success('Your test has successfully been run! Get results')
-                        with st.expander("Show Results"):
-                            st.subheader("Data Quality result")
-                            display_test_result(expectation_result.to_json_dict())
-                    except:
-                        st.write("Please rephrase sentence")
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                open_docs_button = st.button("Open Data Docs")
-                if open_docs_button:
-                    # Get the URL to the Data Docs
-                    data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
-                    st.write(data_docs_url)
+            if DQ_APP is None:  # Create DQ_APP object if not already created
+                DQ_APP = DataQuality(data_source, data)
+            # Perform data quality checks
+            st.subheader("Perform Data Quality Checks")
 
-                    # Open the URL in the browser
-                    webbrowser.open_new_tab(data_docs_url)
+    else:
+        tables = get_pg_tables()
+        data_source = st.selectbox("Select PostgreSQL table", [""]+tables)
+        if data_source:
+            # Display a preview of the data
+            st.subheader("Preview of the data:")
+            try:
+                data = read_pg_tables(data_source)
+                filtered_df = dataframe_explorer(data, case=False)
+                st.dataframe(filtered_df, use_container_width=True)
+            except:
+                raise Exception("Sorry, no numbers below zero")
             
-            with col2:
-                if session_state['page'] == 'home':
-                        data_owner_button = st.button("Contact Data Owner")
-                        if data_owner_button:
-                            session_state['page'] = 'contact_form'
+            DQ_APP = PostgreSQLDatasource('pulaar_translation_db', data_source)
+            st.subheader("Perform Data Quality Checks")
+    
+    checks_input = st.text_area("Describe the checks you want to perform",
+                                        placeholder="For instance:  'Check that none of the values in the address column match the pattern for an address starting with a digit'. \n Provide the accurate column name as in the example.")
+    # Button to get started
+    if checks_input:
+        submit_button = st.button("Submit")
+        if submit_button:
+            with st.spinner('Running your data quality checks'):
+                time.sleep(5)
+                try:
+                    nltoge = naturallanguagetoexpectation(checks_input)
+                    st.write(nltoge)
+                    expectation_result = DQ_APP.run_expectation(nltoge)
+                        #print(expectation_result.to_json_dict())
+                    st.success('Your test has successfully been run! Get results')
+                    with st.expander("Show Results"):
+                        st.subheader("Data Quality result")
+                        display_test_result(expectation_result.to_json_dict())
+                except:
+                    st.write("Please rephrase sentence")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            open_docs_button = st.button("Open Data Docs")
+            if open_docs_button:
+                # Get the URL to the Data Docs
+                data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
+                st.write(data_docs_url)
 
-                if session_state['page'] == 'contact_form':
-                        st.header("Contact Form")
-                        sender_email = "annotepulaar@gmail.com"
-                        recipient_email = st.text_input("Recipient Email", value=data_owners[data_source])
-                        subject = st.text_input("Subject")
-                        message = st.text_area("Message")
-                        attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
-                        if st.button("Send Email"):
-                            send_email_with_attachment(sender_email, recipient_email, subject, message, attachement)
-                            session_state['page'] = 'email_sent'
+                # Open the URL in the browser
+                webbrowser.open_new_tab(data_docs_url)
+            
+        with col2:
+            if session_state['page'] == 'home':
+                    data_owner_button = st.button("Contact Data Owner")
+                    if data_owner_button:
+                        session_state['page'] = 'contact_form'
+
+            if session_state['page'] == 'contact_form':
+                    st.header("Contact Form")
+                    sender_email = "annotepulaar@gmail.com"
+                    recipient_email = st.text_input("Recipient Email", value=data_owners[data_source])
+                    subject = st.text_input("Subject")
+                    message = st.text_area("Message")
+                    attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
+                    if st.button("Send Email"):
+                        send_email_with_attachment(sender_email, recipient_email, subject, message, attachement)
+                        session_state['page'] = 'email_sent'
                             
-            if session_state['page'] == 'email_sent':
-                session_state['page'] = 'home'
+        if session_state['page'] == 'email_sent':
+            session_state['page'] = 'home'
 
 local_css("great_expectations/ui/front.css")
 remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')

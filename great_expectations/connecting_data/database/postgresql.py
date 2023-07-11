@@ -54,7 +54,7 @@ class PostgreSQLDatasource():
         Create data source if it does not exist or updating existing one
         """
         datasource_yaml = rf"""
-        name: {self.database}
+        name: {self.asset_name}
         class_name: Datasource
         execution_engine:
             class_name: SqlAlchemyExecutionEngine
