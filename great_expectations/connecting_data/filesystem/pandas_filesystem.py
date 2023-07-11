@@ -87,7 +87,7 @@ class DataQuality():
 
         validator.save_expectation_suite(discard_failed_expectations=False)
         self.run_ge_checkpoint(batch_request)
-        
+        #self.context.build_data_docs()
         return expectation_result
     
     def add_or_update_ge_checkpoint(self):
