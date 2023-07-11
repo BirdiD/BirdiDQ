@@ -1,20 +1,47 @@
 import os
 import base64
 from dotenv import load_dotenv, find_dotenv
-import openai
 import streamlit as st
 import plotly.graph_objects as go
 from streamlit_extras.let_it_rain import rain
 import ssl
+import psycopg2
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 load_dotenv(find_dotenv())
 # Get your SendGrid API key from the environment variable
 sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
-openai.api_key  = os.environ.get("OPENAI_API_KEY")
+# Get your postgresql connection string from the environment variable
+POSTGRES_CONNECTION_STRING = os.environ.get('POSTGRES_CONNECTION_STRING')
 
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+
+def get_pg_tables():
+    """
+    List all tables from a PostgreSQL database using a connection string
+    """
+    # Connect to the PostgreSQL database
+    conn = psycopg2.connect(POSTGRES_CONNECTION_STRING)
+
+    # Create a cursor object to interact with the database
+    cursor = conn.cursor()
+
+    # Query to retrieve all table names
+    query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"
+
+    # Execute the query
+    cursor.execute(query)
+
+    # Fetch all the table names
+    tables = cursor.fetchall()
+    tables = [t[0] for t in tables]
+    # Close the cursor and connection
+    cursor.close()
+    conn.close()
+    return tables
+
 
 def display_test_result(result):
     """
@@ -117,21 +144,3 @@ def get_mapping(folder_path):
             data_owners[name_with_uppercase] = "dioula01@gmail.com"
     return mapping_dict, data_owners
 
-
-def naturallanguagetoexpectation(sentence):
-    """
-    Convert Natural Lnaguage Query to GE expectation checks
-    """
-    ftmodel = "davinci:ft-personal-2023-06-22-11-04-40"
-    prompt = f"{sentence}\n\n###\n\n"
-    response = openai.Completion.create(
-    model=ftmodel,
-    prompt=prompt,
-    temperature=0.7,
-    max_tokens=256,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0,
-    stop= [" STOP"]
-    )
-    return response['choices'][0]['text']

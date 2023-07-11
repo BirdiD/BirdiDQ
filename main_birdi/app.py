@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 import pandas as pd
 import time
 import webbrowser
+from gpt_model import naturallanguagetoexpectation
 from utils import * 
 from geutils import DataQuality
 from streamlit_extras.dataframe_explorer import dataframe_explorer
