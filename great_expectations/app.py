@@ -142,7 +142,7 @@ def main():
     with t1:
         mapping, data_owners = local_dataowners(local_filesystem_path)
         tables = list(mapping.keys())
-        data_source = selectbox("Select table name", [""]+tables)
+        data_source = selectbox("Select table name", tables)
 
         if data_source:
             # Display a preview of the data
