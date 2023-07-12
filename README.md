@@ -34,5 +34,14 @@ Here are some example queries you can try with BirdiDQ:
 BirdiDQ integrates, connects, and works with a range of tools and services.
 - Filesystem
   - [x] Support Local Filesystem with Pandas
+  - [] Support Local Filesystem with Spark
 - Database
   - [x] Support PostgreSQL
+  - [] Support BigQuery
+  - [] Support Snowflake
+  - [] Support Amazon Athena
+  - [] Support AWS Redshift
+- Cloud
+  - [] Connect to data on Amazon S3 using Pandas
+  - [] Connect to data on Azure Blob storage using Pandas
+  - [] Connect to data on GCS using Pandas
