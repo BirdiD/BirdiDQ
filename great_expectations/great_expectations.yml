@@ -16,34 +16,35 @@ config_version: 3.0
 datasources:
   Users:
     class_name: Datasource
-    execution_engine:
-      module_name: great_expectations.execution_engine
-      class_name: PandasExecutionEngine
+    module_name: great_expectations.datasource
     data_connectors:
       runtime_connector:
         class_name: RuntimeDataConnector
-        name: runtime_connector
+        module_name: great_expectations.datasource.data_connector
         batch_identifiers:
           - run_id
-        module_name: great_expectations.datasource.data_connector
-    module_name: great_expectations.datasource
+    execution_engine:
+      module_name: great_expectations.execution_engine
+      class_name: PandasExecutionEngine
   pulaar_translation_db:
     class_name: Datasource
-    execution_engine:
-      connection_string: postgresql://postgres:FulaSpeechCorpora@localhost:5432/pulaar_translation_db
-      module_name: great_expectations.execution_engine
-      class_name: SqlAlchemyExecutionEngine
+    module_name: great_expectations.datasource
     data_connectors:
       default_runtime_data_connector_name:
+        name: default_runtime_data_connector_name
         class_name: RuntimeDataConnector
+        module_name: great_expectations.datasource.data_connector
         batch_identifiers:
           - default_identifier_name
-        module_name: great_expectations.datasource.data_connector
       default_inferred_data_connector_name:
+        name: default_inferred_data_connector_name
+        include_schema_name: true
         class_name: InferredAssetSqlDataConnector
         module_name: great_expectations.datasource.data_connector
-        include_schema_name: true
-    module_name: great_expectations.datasource
+    execution_engine:
+      module_name: great_expectations.execution_engine
+      connection_string: postgresql://postgres:FulaSpeechCorpora@localhost:5432/pulaar_translation_db
+      class_name: SqlAlchemyExecutionEngine
 config_variables_file_path: uncommitted/config_variables.yml
 
 # The plugins_directory will be added to your python path for custom modules
@@ -106,8 +107,8 @@ data_docs_sites:
       class_name: DefaultSiteIndexBuilder
 
 anonymous_usage_statistics:
-  enabled: true
   data_context_id: fb68aca1-bc67-49fb-9e72-a055a36f03dc
+  enabled: true
 notebooks:
 include_rendered_content:
   globally: false
