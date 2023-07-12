@@ -10,3 +10,5 @@ openai
 plotly
 python_dotenv
 sendgrid
+sqlalchemy
+psycopg2-binary

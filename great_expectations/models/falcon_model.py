@@ -24,7 +24,7 @@ def load_peft_model():
 
 def get_expectations(prompt, model, tknizer):
   """
-  Convert natural language query to great expectation methods
+  Convert natural language query to great expectation methods using finetuned falcon 7b
   Params:
     prompt : Natural language query
     model : Model download from huggingface hub

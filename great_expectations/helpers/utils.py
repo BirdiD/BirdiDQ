@@ -1,20 +1,19 @@
 import os
 import base64
 from dotenv import load_dotenv, find_dotenv
-import openai
 import streamlit as st
 import plotly.graph_objects as go
 from streamlit_extras.let_it_rain import rain
 import ssl
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 load_dotenv(find_dotenv())
 # Get your SendGrid API key from the environment variable
 sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
-openai.api_key  = os.environ.get("OPENAI_API_KEY")
 
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 
 def display_test_result(result):
     """
@@ -61,7 +60,9 @@ def display_test_result(result):
         pass
 
 def send_email_with_attachment(sender_email, recipient_email, subject, message, attachment_path):
-    # Create the SendGrid email message
+    """
+    Create the SendGrid email message
+    """
     message = Mail(
         from_email=sender_email,
         to_emails=recipient_email,
@@ -105,33 +106,4 @@ def local_css(file_name):
 def remote_css(url):
     st.markdown(f'<link href="{url}" rel="stylesheet">', unsafe_allow_html=True)
 
-def get_mapping(folder_path):
 
-    mapping_dict = {}
-    data_owners = {}
-    for file_name in os.listdir(folder_path):
-        if file_name.endswith('.csv'):
-            name_without_extension = os.path.splitext(file_name)[0]
-            name_with_uppercase = name_without_extension.capitalize()
-            mapping_dict[name_with_uppercase] = file_name
-            data_owners[name_with_uppercase] = "dioula01@gmail.com"
-    return mapping_dict, data_owners
-
-
-def naturallanguagetoexpectation(sentence):
-    """
-    Convert Natural Lnaguage Query to GE expectation checks
-    """
-    ftmodel = "davinci:ft-personal-2023-06-22-11-04-40"
-    prompt = f"{sentence}\n\n###\n\n"
-    response = openai.Completion.create(
-    model=ftmodel,
-    prompt=prompt,
-    temperature=0.7,
-    max_tokens=256,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0,
-    stop= [" STOP"]
-    )
-    return response['choices'][0]['text']

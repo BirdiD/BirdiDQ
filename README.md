@@ -2,6 +2,9 @@
 
 BirdiDQ is an intuitive and user-friendly data quality application that allows you to run data quality checks on top of python great expectation open source library using natural language queries. Type in your requests, and BirdiDQ will generate the appropriate GE method, run the quality control and return the results along with data docs you need. [Demo Video](https://youtu.be/iPLSUL4SjBk)
 
+![BirdiDQ Screenshot 1](./great_expectations/img/screenshot2.png)
+
+![BirdiDQ Screenshot 2](./great_expectations/img/screenshot1.png)
 
 # Note 
 BirdiDQ is under development and is an open source project. Contributions are welcomed!
@@ -28,3 +31,20 @@ Here are some example queries you can try with BirdiDQ:
 
 - Ensure that at least 80% of the values in the country column are not null.
 - Check that none of the values in the address column match the pattern for an address starting with a digit.
+
+# BirdiDQ Integration Stack
+
+BirdiDQ integrates, connects, and works with a range of tools and services.
+- Filesystem
+  - [x] Support Local Filesystem with Pandas
+  - [ ] Support Local Filesystem with Spark
+- Database
+  - [x] Support PostgreSQL
+  - [ ] Support BigQuery
+  - [ ] Support Snowflake
+  - [ ] Support Amazon Athena
+  - [ ] Support AWS Redshift
+- Cloud
+  - [ ] Connect to data on Amazon S3 using Pandas
+  - [ ] Connect to data on Azure Blob storage using Pandas
+  - [ ] Connect to data on GCS using Pandas
