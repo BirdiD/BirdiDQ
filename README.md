@@ -28,3 +28,11 @@ Here are some example queries you can try with BirdiDQ:
 
 - Ensure that at least 80% of the values in the country column are not null.
 - Check that none of the values in the address column match the pattern for an address starting with a digit.
+
+# Integration
+
+BirdiDQ integrates, connects, and works with a range of tools and services.
+- Filesystem
+  - [x] Support Local Filesystem with Pandas
+- Database
+  - [x] Support PostgreSQL
