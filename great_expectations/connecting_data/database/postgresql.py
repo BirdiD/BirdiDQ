@@ -46,9 +46,12 @@ def postgresql_data_owners():
     return {datasource : 'postgreso@birdidq.com' for datasource in tables}
 
 class PostgreSQLDatasource():
+    """
+    Run Data Quality checks on PostgreSQL data database
+    """
     def __init__(self, database, asset_name):
         """ 
-        create great expectations context and default runtime datasource
+        Init class attributes
         """
         self.database = database
         self.asset_name = asset_name

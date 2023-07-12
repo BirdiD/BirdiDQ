@@ -8,10 +8,12 @@ import pandas as pd
 import os
 
 class PandasFilesystemDatasource():
-
+    """
+    Run Data Quality checks on Local Filesystem data
+    """
     def __init__(self, datasource_name, dataframe):
         """ 
-        create great expectations context and default runtime datasource
+        Init class attributes
         """
         self.datasource_name = datasource_name
         self.expectation_suite_name = f"{datasource_name}_expectation_suite"
