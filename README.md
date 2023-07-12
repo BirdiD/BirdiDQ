@@ -4,6 +4,8 @@ BirdiDQ is an intuitive and user-friendly data quality application that allows y
 
 ![BirdiDQ Screenshot 1](./great_expectations/img/screenshot2.png)
 
+![BirdiDQ Screenshot 2](./great_expectations/img/screenshot1.png)
+
 # Note 
 BirdiDQ is under development and is an open source project. Contributions are welcomed!
 
