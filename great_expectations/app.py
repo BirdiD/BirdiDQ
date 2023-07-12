@@ -29,14 +29,25 @@ with open("great_expectations/ui/side.md", "r") as sidebar_file:
 st.sidebar.markdown(sidebar_content, unsafe_allow_html=True)
 
 def display_data_preview(data):
+    """
+    Display data for quick data exploration
+    Params:
+        data (DataFrame) : Selected table on which to run DQ checks    
+    """
     try:
         filtered_df = dataframe_explorer(data, case=False)
         st.dataframe(filtered_df, use_container_width=True)
     except:
         raise Exception("Unable to preview data")
 
-# Function to perform data quality checks
+
 def perform_data_quality_checks(DQ_APP):
+    """
+    Function to perform data quality checks
+    Params:
+        DQ_APP (object) : Instanciated class for data quality checks
+                          (Data sources : PostgreSQL, Filesystem, etc.)
+    """
     st.subheader("Perform Data Quality Checks")
     checks_input = st.text_area("Describe the checks you want to perform",
                                 placeholder="For instance:  'Check that none of the values in the address column match the pattern for an address starting with a digit'. \n Provide the accurate column name as in the example.")
@@ -58,14 +69,27 @@ def perform_data_quality_checks(DQ_APP):
                     st.write("Please rephrase sentence and ensure you correctly wrote the column name")
 
 def open_data_docs(DQ_APP):
+    """
+    Open expectation data docs (great expection html output)
+    Params:
+        DQ_APP (object) : Instanciated class for data quality checks
+                          (Data sources : PostgreSQL, Filesystem, etc.)
+    """
     open_docs_button = st.button("Open Data Docs")
     if open_docs_button:
         data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
         st.write(data_docs_url)
         webbrowser.open_new_tab(data_docs_url)
 
-# Function to contact data owner
+
 def contact_data_owner(session_state, data_owners, data_source):
+    """
+    Function to contact data owner
+    Params:
+        session_state : Current session state
+        data_owners (dict) : Contains data sources (tables) as dict keys and the data owner email for each data source
+        data_source (str) : Selected data source by user on which they want to run data quality checks
+    """
     try:
         if session_state['page'] == 'home':
             data_owner_button = st.button("Contact Data Owner")
@@ -105,17 +129,15 @@ def next_steps(DQ_APP, data_owners, data_source):
 
 def main():
     # Set the app title
-    DQ_APP = None  # Initialize DQ_APP object
+    DQ_APP = None  
     data_owners = None
     data_source = None
 
     if 'page' not in session_state:
         session_state['page'] = 'home'
-    # Select the data source
-    connecting_data_list = ['Local File System','PostgreSQL']
-    t1,t2 = st.tabs(['Local File System','PostgreSQL']) 
 
-    #connecting_data = st.selectbox("Select your data connector", connecting_data_list)
+    # Select the data connection
+    t1,t2 = st.tabs(['Local File System','PostgreSQL']) 
 
     with t1:
         mapping, data_owners = local_dataowners(local_filesystem_path)
