@@ -60,7 +60,9 @@ def display_test_result(result):
         pass
 
 def send_email_with_attachment(sender_email, recipient_email, subject, message, attachment_path):
-    # Create the SendGrid email message
+    """
+    Create the SendGrid email message
+    """
     message = Mail(
         from_email=sender_email,
         to_emails=recipient_email,
