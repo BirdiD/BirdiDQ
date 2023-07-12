@@ -104,15 +104,4 @@ def local_css(file_name):
 def remote_css(url):
     st.markdown(f'<link href="{url}" rel="stylesheet">', unsafe_allow_html=True)
 
-def get_mapping(folder_path):
-
-    mapping_dict = {}
-    data_owners = {}
-    for file_name in os.listdir(folder_path):
-        if file_name.endswith('.csv'):
-            name_without_extension = os.path.splitext(file_name)[0]
-            name_with_uppercase = name_without_extension.capitalize()
-            mapping_dict[name_with_uppercase] = file_name
-            data_owners[name_with_uppercase] = "dioula01@gmail.com"
-    return mapping_dict, data_owners
 

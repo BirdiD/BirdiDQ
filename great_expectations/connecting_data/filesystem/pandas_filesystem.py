@@ -4,8 +4,10 @@ from great_expectations.core.batch import RuntimeBatchRequest
 from great_expectations.checkpoint.checkpoint import SimpleCheckpoint
 from ruamel import yaml
 import ruamel
+import pandas as pd
+import os
 
-class DataQuality():
+class PandasFilesystemDatasource():
 
     def __init__(self, datasource_name, dataframe):
         """ 
@@ -117,3 +119,28 @@ class DataQuality():
                             }
                             ],
                 )
+
+def get_mapping(folder_path):
+    """
+    Map each local file to the correspondind data owner (DO)
+    """
+    mapping_dict = {}
+    data_owners = {}
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith('.csv'):
+            name_without_extension = os.path.splitext(file_name)[0]
+            name_with_uppercase = name_without_extension.capitalize()
+            mapping_dict[name_with_uppercase] = file_name
+            data_owners[name_with_uppercase] = "dioula01@gmail.com" #default DO for all files. To be modified
+    return mapping_dict, data_owners
+
+
+# Function to get mapping and data owners
+def local_dataowners(local_filesystem_path):
+    mapping, data_owners = get_mapping(local_filesystem_path)
+    return mapping, data_owners
+
+# Function to read local filesytem .csv file in a datafrale
+def read_local_filesystem_tb(local_filesystem_path, data_source, mapping):
+    data = pd.read_csv(f"{local_filesystem_path}{mapping.get(data_source, None)}")
+    return data

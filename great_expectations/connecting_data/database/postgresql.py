@@ -38,6 +38,13 @@ def get_pg_tables():
     conn.close()
     return tables
 
+def postgresql_data_owners():
+    """
+    Map each postgresql with its data owner
+    """
+    tables = get_pg_tables()
+    return {datasource : 'postgreso@birdidq.com' for datasource in tables}
+
 class PostgreSQLDatasource():
     def __init__(self, database, asset_name):
         """ 

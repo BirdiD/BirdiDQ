@@ -6,9 +6,12 @@ import webbrowser
 from models.gpt_model import naturallanguagetoexpectation
 from helpers.utils import * 
 from connecting_data.database.postgresql import *
-from connecting_data.filesystem.pandas_filesystem import DataQuality
+from connecting_data.filesystem.pandas_filesystem import *
 from streamlit_extras.dataframe_explorer import dataframe_explorer
+from streamlit_extras.no_default_selectbox import selectbox
 
+local_filesystem_path = 'great_expectations/data/'
+session_state = st.session_state
 
 st.set_page_config(
     page_title="BirdiDQ",
@@ -25,105 +28,125 @@ with open("great_expectations/ui/side.md", "r") as sidebar_file:
 # Display the DDL for the selected table
 st.sidebar.markdown(sidebar_content, unsafe_allow_html=True)
 
+def display_data_preview(data):
+    try:
+        filtered_df = dataframe_explorer(data, case=False)
+        st.dataframe(filtered_df, use_container_width=True)
+    except:
+        raise Exception("Unable to preview data")
 
-def main():
-    # Set the app title
-    session_state = st.session_state
-    if 'page' not in session_state:
-        session_state['page'] = 'home'
-    # Select the data source
-    connecting_data_list = ['','Local File System','PostgreSQL']
-    connecting_data = st.selectbox("Select your data connector", connecting_data_list)
-    
-    DQ_APP = None  # Initialize DQ_APP object
-    checks_input = None  # Initialize checks_input variable
-
-    if connecting_data=='Local File System':
-        mapping, data_owners = get_mapping('great_expectations/data/')
-        datasources = list(mapping.keys())
-        data_source = st.selectbox("Select table name", [""]+datasources)
-
-        if data_source:
-            # Display a preview of the data
-            st.subheader("Preview of the data:")
-            try:
-                data = pd.read_csv(f"great_expectations/data/{mapping.get(data_source, None)}")
-                filtered_df = dataframe_explorer(data, case=False)
-                st.dataframe(filtered_df, use_container_width=True)
-            except:
-                raise Exception("Sorry, no numbers below zero")
-
-            if DQ_APP is None:  # Create DQ_APP object if not already created
-                DQ_APP = DataQuality(data_source, data)
-            # Perform data quality checks
-            st.subheader("Perform Data Quality Checks")
-
-    else:
-        tables = get_pg_tables()
-        data_source = st.selectbox("Select PostgreSQL table", [""]+tables)
-        if data_source:
-            # Display a preview of the data
-            st.subheader("Preview of the data:")
-            try:
-                data = read_pg_tables(data_source)
-                filtered_df = dataframe_explorer(data, case=False)
-                st.dataframe(filtered_df, use_container_width=True)
-            except:
-                raise Exception("Sorry, no numbers below zero")
-            
-            DQ_APP = PostgreSQLDatasource('pulaar_translation_db', data_source)
-            st.subheader("Perform Data Quality Checks")
-    
+# Function to perform data quality checks
+def perform_data_quality_checks(DQ_APP):
+    st.subheader("Perform Data Quality Checks")
     checks_input = st.text_area("Describe the checks you want to perform",
-                                        placeholder="For instance:  'Check that none of the values in the address column match the pattern for an address starting with a digit'. \n Provide the accurate column name as in the example.")
-    # Button to get started
+                                placeholder="For instance:  'Check that none of the values in the address column match the pattern for an address starting with a digit'. \n Provide the accurate column name as in the example.")
+
     if checks_input:
         submit_button = st.button("Submit")
         if submit_button:
             with st.spinner('Running your data quality checks'):
-                time.sleep(5)
+                time.sleep(15)
                 try:
                     nltoge = naturallanguagetoexpectation(checks_input)
                     st.write(nltoge)
                     expectation_result = DQ_APP.run_expectation(nltoge)
-                        #print(expectation_result.to_json_dict())
                     st.success('Your test has successfully been run! Get results')
                     with st.expander("Show Results"):
                         st.subheader("Data Quality result")
                         display_test_result(expectation_result.to_json_dict())
                 except:
-                    st.write("Please rephrase sentence")
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            open_docs_button = st.button("Open Data Docs")
-            if open_docs_button:
-                # Get the URL to the Data Docs
-                data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
-                st.write(data_docs_url)
+                    st.write("Please rephrase sentence and ensure you correctly wrote the column name")
 
-                # Open the URL in the browser
-                webbrowser.open_new_tab(data_docs_url)
-            
-        with col2:
-            if session_state['page'] == 'home':
-                    data_owner_button = st.button("Contact Data Owner")
-                    if data_owner_button:
-                        session_state['page'] = 'contact_form'
+def open_data_docs(DQ_APP):
+    open_docs_button = st.button("Open Data Docs")
+    if open_docs_button:
+        data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
+        st.write(data_docs_url)
+        webbrowser.open_new_tab(data_docs_url)
 
-            if session_state['page'] == 'contact_form':
-                    st.header("Contact Form")
-                    sender_email = "annotepulaar@gmail.com"
-                    recipient_email = st.text_input("Recipient Email", value=data_owners[data_source])
-                    subject = st.text_input("Subject")
-                    message = st.text_area("Message")
-                    attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
-                    if st.button("Send Email"):
-                        send_email_with_attachment(sender_email, recipient_email, subject, message, attachement)
-                        session_state['page'] = 'email_sent'
-                            
+# Function to contact data owner
+def contact_data_owner(session_state, data_owners, data_source):
+    try:
+        if session_state['page'] == 'home':
+            data_owner_button = st.button("Contact Data Owner")
+            if data_owner_button:
+                session_state['page'] = 'contact_form'
+
+        if session_state['page'] == 'contact_form':
+            st.header("Contact Form")
+            sender_email = "birdidq@gmail.com"
+            recipient_email = st.text_input("Recipient Email", value=data_owners[data_source])
+            subject = st.text_input("Subject")
+            message = st.text_area("Message")
+            attachement = "great_expectations/uncommitted/data_docs/local_site/index.html"
+            if st.button("Send Email"):
+                send_email_with_attachment(sender_email, recipient_email, subject, message, attachement)
+                session_state['page'] = 'email_sent'
+
         if session_state['page'] == 'email_sent':
             session_state['page'] = 'home'
+    except:
+        st.warning('Please select the datasource to contact Data Owner', icon="⚠️")
+        Exception("Please select the datasource")
 
+def next_steps(DQ_APP, data_owners, data_source):
+    """
+    Actions to take after running data quality checks
+    View expectation data docs
+    Contact Data Owner by email with data docs as attachment
+    """
+    st.subheader("What's next ?")
+    t1,t2 = st.tabs(['Expectation Data Docs','Get in touch with Data Owner']) 
+    with t1:
+        open_data_docs(DQ_APP)
+    with t2:           
+        contact_data_owner(session_state, data_owners, data_source)
+
+
+def main():
+    # Set the app title
+    DQ_APP = None  # Initialize DQ_APP object
+    data_owners = None
+    data_source = None
+
+    if 'page' not in session_state:
+        session_state['page'] = 'home'
+    # Select the data source
+    connecting_data_list = ['Local File System','PostgreSQL']
+    t1,t2 = st.tabs(['Local File System','PostgreSQL']) 
+
+    #connecting_data = st.selectbox("Select your data connector", connecting_data_list)
+
+    with t1:
+        mapping, data_owners = local_dataowners(local_filesystem_path)
+        tables = list(mapping.keys())
+        data_source = selectbox("Select table name", [""]+tables)
+
+        if data_source:
+            # Display a preview of the data
+            st.subheader("Preview of the data:")
+            data = read_local_filesystem_tb(local_filesystem_path, data_source, mapping)
+            display_data_preview(data)
+
+            DQ_APP = PandasFilesystemDatasource(data_source, data)
+            perform_data_quality_checks(DQ_APP)
+            next_steps(DQ_APP, data_owners, data_source)
+
+    with t2:
+        data_owners = postgresql_data_owners()
+        tables = get_pg_tables()
+        data_source = selectbox("Select PostgreSQL table", tables)
+        if data_source:
+            # Display a preview of the data
+            st.subheader("Preview of the data:")
+            data = read_pg_tables(data_source)
+            display_data_preview(data)
+       
+            DQ_APP = PostgreSQLDatasource('pulaar_translation_db', data_source)
+            perform_data_quality_checks(DQ_APP)
+            next_steps(DQ_APP, data_owners, data_source)
+
+ 
 local_css("great_expectations/ui/front.css")
 remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 remote_css('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700&display=swap')
