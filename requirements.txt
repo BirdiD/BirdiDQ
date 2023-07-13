@@ -10,5 +10,5 @@ openai
 plotly
 python_dotenv
 sendgrid
-sqlalchemy
+sqlalchemy==1.4.49
 psycopg2-binary
