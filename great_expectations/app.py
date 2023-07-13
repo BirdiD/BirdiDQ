@@ -25,7 +25,7 @@ st.set_page_config(
 st.title("❄️ BirdiDQ")
 st.markdown('<h1 style="font-size: 24px; font-weight: bold; margin-bottom: 0;">Welcome to your DQ App</h1>', unsafe_allow_html=True)
 
-with open("great_expectations/ui/side.md", "r") as sidebar_file:
+with open("great_expectations/ui/side.md", "r", encoding="utf-8") as sidebar_file:
     sidebar_content = sidebar_file.read()
 
 # Display the DDL for the selected table
