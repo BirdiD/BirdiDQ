@@ -82,9 +82,13 @@ def open_data_docs(DQ_APP, key):
 
     open_docs_button = st.button("Open Data Docs", key=key.format(name='data_docs'))
     if open_docs_button:
-        data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
-        st.write(data_docs_url)
-        webbrowser.open_new_tab(data_docs_url)
+        try:
+            data_docs_url = DQ_APP.context.get_docs_sites_urls()[0]['site_url']
+            st.write(data_docs_url)
+            webbrowser.open_new_tab(data_docs_url)
+        except:
+            st.warning('Unable to open html report. Ensure that you have great_expectations/uncommited folder with validations and data_docs/local_site subfolders.', icon="⚠️")
+
 
 
 def contact_data_owner(session_state, data_owners, data_source, key):
@@ -162,19 +166,23 @@ def main():
             next_steps(DQ_APP, data_owners, data_source, key)
 
     with t2:
-        data_owners = postgresql_data_owners()
-        tables = get_pg_tables()
-        data_source = selectbox("Select PostgreSQL table", tables)
-        if data_source:
-            key = "postgresql_{name}"
-            # Display a preview of the data
-            st.subheader("Preview of the data:")
-            data = read_pg_tables(data_source)
-            display_data_preview(data)
-       
-            DQ_APP = PostgreSQLDatasource('pulaar_translation_db', data_source)
-            perform_data_quality_checks(DQ_APP, key)
-            next_steps(DQ_APP, data_owners, data_source, key)
+        try:
+            data_owners = postgresql_data_owners()
+            tables = get_pg_tables()
+            data_source = selectbox("Select PostgreSQL table", tables)
+            if data_source:
+                key = "postgresql_{name}"
+                # Display a preview of the data
+                st.subheader("Preview of the data:")
+                data = read_pg_tables(data_source)
+                display_data_preview(data)
+        
+                DQ_APP = PostgreSQLDatasource('pulaar_translation_db', data_source)
+                perform_data_quality_checks(DQ_APP, key)
+                next_steps(DQ_APP, data_owners, data_source, key)
+        except:
+            st.warning('Unable to connect to Postgresql. Please verify that you have added your connection string in .env file', icon="⚠️")
+            Exception("PostgreSQL Connection error")
 
  
 local_css("great_expectations/ui/front.css")
