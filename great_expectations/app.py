@@ -70,7 +70,7 @@ def perform_data_quality_checks(DQ_APP, key):
                         st.subheader("Data Quality result")
                         display_test_result(expectation_result.to_json_dict())
                 except:
-                    st.write("Please rephrase sentence and ensure you correctly wrote the column name")
+                    st.write("Unable to succesfully run the query. This may occur if you either have not selected the correct model (finetuned Falcon-7b model) or you mispelled the column name.")
 
 def open_data_docs(DQ_APP, key):
     """
@@ -120,8 +120,7 @@ def contact_data_owner(session_state, data_owners, data_source, key):
         if session_state['page'] == 'email_sent':
             session_state['page'] = 'home'
     except:
-        st.warning('Please select the datasource to contact Data Owner', icon="⚠️")
-        Exception("Please select the datasource")
+        st.warning('Unable to send email. Verify the email setup.', icon="⚠️")
 
 def next_steps(DQ_APP, data_owners, data_source, key):
     """
