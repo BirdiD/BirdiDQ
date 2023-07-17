@@ -35,7 +35,7 @@ To run BirdiDQ, you need to perform the following steps:
 1. Clone the repository locally:
   
         git clone https://github.com/BirdiD/BirdiDQ.git
-        
+
 2. (Recommended) Create a virtual environment and activate it:
 
         python3 -m venv bir_env
@@ -48,6 +48,15 @@ To run BirdiDQ, you need to perform the following steps:
 4. Run the app:
 
         streamlit run great_expectations/app.py
+
+Note: BirdiDQ can use OpenAI's ChatGPT or Falcon LLM to convert the natural language descriptions to expectations. If you plan to use Falcon, consider using Pytorch with GPU support for better performance. To install Pytorch with CUDA support follow the instructions avaiable at for your Operating System at [Pytorch](https://pytorch.org/get-started/locally/).
+
+## System requirements for local Falcon LLM usage
+
+Falcon 7b is an open source large language model (LLM) that can be used with BirdiDQ to convert natural language descriptions to Great Expectations expectations. To use the current fine-tuned Falcon 7b, you need to have a system with the following minimum requirements:
+
+- If you don't have a GPU, you need at least 16GB of RAM to load the model into the memory. Inferencing will be really slow.
+- You need a GPU with at least 16GB of VRAM to load the model into the memory. Inferencing will be faster.
 
 ## Example Queries
 

@@ -5,6 +5,7 @@ import time
 import random
 import webbrowser
 from models.gpt_model import naturallanguagetoexpectation
+from models.falcon_model import get_expectations, load_peft_model
 from helpers.utils import * 
 from connecting_data.database.postgresql import *
 from connecting_data.filesystem.pandas_filesystem import *
@@ -62,7 +63,8 @@ def perform_data_quality_checks(DQ_APP, key):
             with st.spinner('Running your data quality checks'):
                 time.sleep(10)
                 try:
-                    nltoge = naturallanguagetoexpectation(checks_input)
+                    model, tknizer = load_peft_model()
+                    nltoge = get_expectations(checks_input, model, tknizer)
                     st.write(nltoge)
                     expectation_result = DQ_APP.run_expectation(nltoge)
                     st.success('Your test has successfully been run! Get results')
